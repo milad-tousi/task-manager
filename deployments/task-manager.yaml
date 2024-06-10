@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskmanager-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taskmanager
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1    
+  template:
+    metadata:
+      labels: 
+        app: taskmanager
+    spec:
+      containers:
+        - name: taskmanager-container
+          image: tousi/task-manager:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taskmanager-service
+  labels:
+    app: taskmanager  
+spec:
+  selector:
+    app: taskmanager
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 31205
+  type: NodePort
